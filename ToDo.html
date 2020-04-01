@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">        
+        <title>Angular ToDo WebApp</title>
+        
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+	</head>
+	<body ng-app="todoApp" ng-controller="defaultController" class="bg-dark text-light">
+		<br>
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 text-center">
+					<h4>{{ date }}</h4>
+					<h2 class="text-muted">{{ time }}</h2>
+				</div>
+				<div class="col-xl-8 col-lg-8 col-md-8 col-sm-12 text-center">
+					<h1 class="display-4">Angular ToDo</h1>
+				</div>
+			</div>
+		</div>
+		<br>
+		<br>
+		<br>
+		<div class="container text-center">
+			<div class="row">
+				<div class="col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 text-center">
+				</div>
+				<div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 text-center">
+					<div class="input-group input-group-lg">
+						<input type="text" class="form-control rounded-0" placeholder="Your task here" aria-describedby="sizing-addon1" ng-model="newTask">
+					</div>
+				</div>
+				<div class="col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 text-center">
+				</div>
+			</div>
+			<br>
+			<div class="row">
+				<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 text-center">
+					<button type="button" class="btn btn-warning rounded-0" ng-click="addItem()">Add</button>
+					<button type="button" class="btn btn-info rounded-0" ng-click="resetItem()">Reset</button>
+				</div>
+			</div>
+		</div>
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+					<br>
+					<br>
+					<br>
+					<br>
+					<br>
+					<div class="card card-outline-primary text-center rounded-0 bg-primary text-light">
+						<div class="card-block">
+							<br>
+							<h4 class="card-title">In progress</h4>
+							<br>
+						</div>
+							<ul class="list-group list-group-flush">
+								<li class="list-group-item bg-primary" ng-repeat="item in tasks" ng-if="!item.status">
+									<span class="align-middle">{{ item.task }}</span>
+									<br>
+									<span style="float: right; font-size: 7px;" class="align-middle">Added on {{ date }} at {{ time }} </span>
+									<br>
+									
+									
+									<button type="button" class="btn btn-success btn-sm" style="float: right;" ng-click="markAsDone( item.id )">Mark as Complete</button>
+								</li>
+							</ul>
+						<div class="card-block">
+						</div>
+					</div>
+				</div>
+				<div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+					<br>
+					<br>
+					<br>
+					<br>
+					<br>
+					<div class="card card-outline-success text-center rounded-0 bg-success text-light">
+						<div class="card-block">
+							<br>
+							<h4 class="card-title">Completed</h4>
+							<br>
+						</div>
+							<ul class="list-group list-group-flush">
+								<li class="list-group-item bg-success" ng-repeat="item in tasks" ng-if="item.status">
+									<span class="align-middle">{{ item.task }}</span>
+									<br>
+									<span style="float: right; font-size: 7px;" class="align-middle">completed on {{ date }} at {{ time }} </span>
+									<br>
+									<button type="button" class="btn btn-danger btn-sm" style="float: right;" ng-click="markAsInprogress( item.id )">Move to In-Progress</button>
+								</li>
+							</ul>
+						<div class="card-block">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="container-fluid" style="margin-top: 25%; padding-bottom: 10%;">
+			<div class="row">
+				<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 text-center">
+					<h1 class="display-4" style="font-size: 1.75rem;">A  todo app built using AngularJS and Bootstrap 4</h1>
+					<br>
+					<br>
+					<br>
+					<h1 class="display-4">  </h1>
+				</div>
+			</div>
+		</div>
+		<!-- Loading scripts -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.min.js"></script>
+		<script>
+			var app = angular.module("todoApp", []);
+			app.controller("defaultController", function($scope, $filter, $interval) {
+				//date & time for render
+                $scope.date = '';
+				$scope.time = '';
+                //initial refresh time
+                $scope.refreshInterval = 1;
+				$scope.newTask = '';
+				//container of in-progress todo's
+				$scope.tasks = [];
+				//count of tasks
+				$scope.countTasks = 0;
+                
+				//add item to tasklist
+				$scope.addItem = function() {
+                    if(!$scope.newTask.length) {
+                        //validation
+                        alertify.error('Cannot add an empty task !');
+                    }
+                    else {
+                        //append a new task
+                        var newItemTask = {'id': ++$scope.countTasks, 'status': 0, 'task': ""};
+                        //in-progress => status 0
+                        newItemTask.status = 0;
+                        newItemTask.task = $scope.newTask;
+                        $scope.newTask = '';
+                        //add to todo list
+                        $scope.tasks.push(newItemTask);
+                        //cleanup
+                        delete(newItemTask);
+                        alertify.success('New task added');
+                    }
+				}
+                //reset the input field
+				$scope.resetItem = function() {
+                    //$scope.newTask = '';
+                    $scope.tasks = [];
+                }
+                //move the item to done status
+				$scope.markAsDone = function(id) {
+					angular.forEach($scope.tasks, function(value, key) {
+						if(value.id == parseInt(id)) {
+                            //update status
+							value.status = 1;
+                            alertify.success('Task moved to Completed');
+                            return true;
+						}
+					});
+				}
+                //move the status to inprogress
+                $scope.markAsInprogress = function(id) {
+					angular.forEach($scope.tasks, function(value, key) {
+						if(value.id == parseInt(id)) {
+                            //update status
+							value.status = 0;
+                            alertify.error('Task moved to In-Progress');
+                            return true;
+						}
+					});
+				}
+                //cron task handler
+                $scope.cron = function() {
+                    $scope.date = $filter('date')(new Date(), "MMMM dd, yyyy");
+                    $scope.time = $filter('date')(new Date(), "hh:mm");
+                    $scope.refreshInterval = 30000; //30s => 30,000ms
+                }
+                //automate cron call
+                $interval($scope.cron, $scope.refreshInterval);
+			});
+		</script>
+		<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.11.0/alertify.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.11.0/css/alertify.min.css" />
+	</body>
+</html>
